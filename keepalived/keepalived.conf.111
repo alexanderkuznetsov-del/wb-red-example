@@ -1,0 +1,39 @@
+global_defs {
+    enable_script_security
+    script_user root
+}
+
+vrrp_script chk_wb_automation {
+    script "/usr/local/bin/wb-ha-healthcheck.sh"
+    interval 2
+    weight -60
+    fall 2
+    rise 2
+}
+
+vrrp_instance VI_WB_PAIR {
+    dont_track_primary
+    state MASTER
+    interface wlan0
+    virtual_router_id 51
+    priority 150
+    advert_int 1
+    unicast_src_ip 192.168.143.111
+    unicast_peer {
+        192.168.143.112
+    }
+    authentication {
+        auth_type PASS
+        auth_pass wbha1
+    }
+    virtual_ipaddress {
+        192.168.143.115/24
+    }
+    track_script {
+        chk_wb_automation
+    }
+    notify_master "/usr/local/bin/wb-ha-notify.sh active"
+    notify_backup "/usr/local/bin/wb-ha-notify.sh standby"
+    notify_fault  "/usr/local/bin/wb-ha-notify.sh fault"
+    preempt_delay 5
+}
