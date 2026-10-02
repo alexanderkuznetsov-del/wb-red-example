@@ -1,13 +1,12 @@
 # Пример для стадии 2 (синхронизация уставок между узлами).
-# Ставится ТОЛЬКО на одной стороне (например, на узле с priority 150) -
-# если прописать такой же connection на обеих сторонах, получаются ДВА
-# параллельных bridge-соединения друг в друга (видно в journalctl -u
-# mosquitto как повторные "Connecting bridge"/"closed its connection"),
-# риск дублирования сообщений.
+# Устанавливается только на одном узле (например, с priority 150). Если
+# прописать такое же подключение на обоих узлах, между ними поднимаются два
+# параллельных bridge-соединения (в journalctl -u mosquitto видны повторные
+# "Connecting bridge"/"closed its connection"), и сообщения могут дублироваться.
 #
-# Бриджится не сам control, а отдельный sync-топик с value+ts -
-# см. wb-rules/README.md про last-write-wins и почему голый mirror
-# retained-топика недостаточен.
+# Через bridge передаётся отдельный sync-топик со значением и меткой времени
+# (value+ts), сам control не передаётся. Почему простого зеркалирования
+# retained-топика недостаточно, описано в wb-rules/setpoint_sync_template.js.
 connection wb-ha-sync
 address 192.168.143.112:1883
 topic /wbha/sync/<CONTROL_NAME> both 1
