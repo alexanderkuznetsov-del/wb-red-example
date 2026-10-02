@@ -1,9 +1,9 @@
-// Модуль резервирования пары контроллеров (VRRP/keepalived).
-// Роль узла (active/standby/fault) публикуется keepalived-скриптом
-// в retained MQTT-топик /devices/system/controls/role на ЭТОМ ЖЕ узле.
+// Модуль проверки роли при записи для резервированной пары (VRRP/keepalived).
+// Роль узла (active/standby/fault) публикует wb-ha-notify.sh в retained
+// MQTT-топик /devices/system/controls/role на этом же узле.
 //
-// Файл идентичен на обоих узлах - ничего per-node здесь не зашито,
-// роль узнаётся из MQTT, а не из констант.
+// Файл одинаков на обоих узлах: настроек под конкретный узел в нём нет,
+// роль берётся из MQTT.
 
 var currentRole = "unknown";
 
@@ -12,11 +12,11 @@ trackMqtt("/devices/system/controls/role", function (message) {
     log("wbha: роль узла изменилась на \"{}\"", currentRole);
 });
 
-// Ведёт себя как dev[], но запись пропускает, если узел не активный.
-// Чтение (1 аргумент) - всегда без ограничений, как обычный dev[control].
+// Работает как dev[], но запись выполняет только на активном узле.
+// Чтение (1 аргумент) - всегда, как обычный dev[control].
 // Запись (2 аргумента) - только если currentRole === "active".
-//   wbha.dev("wb-mr6c_112/K1");        // читать можно всегда
-//   wbha.dev("wb-mr6c_112/K1", true);  // писать - только если активны
+//   wbha.dev("wb-mr6c_112/K1");        // чтение - всегда
+//   wbha.dev("wb-mr6c_112/K1", true);  // запись - только на активном узле
 exports.dev = function (control, value) {
     if (arguments.length < 2) {
         return dev[control];
