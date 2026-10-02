@@ -37,12 +37,10 @@ scripts/                  — /usr/local/bin/ на обоих узлах
   wb-ha-wait-for-ip.sh    — ждёт стабильного появления IP перед стартом keepalived
 mosquitto/
   000persistence.conf          — сохранение retained-сообщений при перезапуске брокера
-  wb-ha-bridge.conf.example    — пример bridge для синхронизации уставок (стадия 2, опционально)
 wb-rules/
   wbha.js                   — модуль проверки роли при записи (на обоих узлах, без правок)
   wb_ha_status.js           — виртуальное устройство для отображения роли (на обоих узлах, без правок)
   motion_light.js           — пример правила, использующего wbha.dev()
-  setpoint_sync_template.js — шаблон синхронизации уставки между узлами (стадия 2, опционально)
 ```
 
 `wb-ha-notify.sh` и `wb-ha-role-heartbeat.sh` содержат константу `PRIORITY` (150 на узле с бо́льшим приоритетом, 100 на другом): она должна совпадать со значением `priority` в `keepalived.conf` этого же узла. `wb-ha-wait-for-ip.sh` содержит IP своего узла. `wbha.js` и `wb_ha_status.js` одинаковы на обоих узлах.
