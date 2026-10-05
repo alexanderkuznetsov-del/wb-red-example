@@ -18,6 +18,7 @@ vrrp_instance VI_WB_PAIR {
     # подключении обычно не нужен.
     dont_track_primary
     state BACKUP
+    # Имя интерфейса и IP-адреса ниже (unicast_src_ip, unicast_peer, virtual_ipaddress) замените на свои.
     interface wlan0
     virtual_router_id 51
     priority 100
