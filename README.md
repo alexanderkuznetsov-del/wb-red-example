@@ -35,6 +35,8 @@ scripts/                  — /usr/local/bin/ на обоих узлах
   wb-ha-notify.sh         — публикует роль, VIP и приоритет при смене состояния VRRP
   wb-ha-role-heartbeat.sh — повторно публикует роль раз в минуту (cron)
   wb-ha-wait-for-ip.sh    — ждёт стабильного появления IP перед стартом keepalived
+cron/
+  wb-ha-role-heartbeat    — запуск wb-ha-role-heartbeat.sh раз в минуту
 mosquitto/
   000persistence.conf          — сохранение retained-сообщений при перезапуске брокера
 wb-rules/
@@ -50,16 +52,22 @@ wb-rules/
 1. `apt-get install -y keepalived` на оба узла.
 2. Разложить `keepalived.conf.*` → `/etc/keepalived/keepalived.conf` (свой файл на каждый узел), `override.conf` → `/etc/systemd/system/keepalived.service.d/override.conf`.
 3. Скрипты из `scripts/` → `/usr/local/bin/`, права `root:root 755`.
-4. `mosquitto/000persistence.conf` → `/etc/mosquitto/conf.d/`.
-5. `wb-rules/wbha.js` → `/etc/wb-rules-modules/`, остальные `.js` из `wb-rules/` → `/etc/wb-rules/`.
-6. Перезапустить `keepalived`, `mosquitto`, `wb-rules` на обоих узлах.
-7. Проверить работу пары тестами на контроллерах, см. «Тайминги, подтверждённые тестами».
+4. Скопировать на оба узла `cron/wb-ha-role-heartbeat` → `/etc/cron.d/wb-ha-role-heartbeat`, права `root:root 644`.
+5. `mosquitto/000persistence.conf` → `/etc/mosquitto/conf.d/`.
+6. Скопировать на оба узла (файлы одинаковые на обоих узлах):
+   - `wb-rules/wbha.js` → `/etc/wb-rules-modules/wbha.js`;
+   - `wb-rules/wb_ha_status.js` → `/etc/wb-rules/wb_ha_status.js`;
+   - `wb-rules/motion_light.js` → `/etc/wb-rules/motion_light.js`.
+
+   **Примечание.** Файл `motion_light.js` содержит пути к реальному оборудованию: `wb-mr6c_112/K1` и `wb-msw-v4_155/Current Motion`. Перед копированием скорректируйте их в соответствии с вашей установкой.
+7. Перезапустить `keepalived`, `mosquitto`, `wb-rules` на обоих узлах.
+8. Проверить работу пары тестами на контроллерах, см. «Тайминги, подтверждённые тестами».
 
 ## Тайминги, подтверждённые тестами
 
 - Отключение питания или сети на активном узле: резервный узел становится активным примерно через 3 с (срабатывание протокола VRRP).
 - Отказ автоматики при работающей ОС (`systemctl stop wb-rules`): резервный узел становится активным примерно через 8 с. Оба узла одновременно в роли active при этом не оказываются: по логам `keepalived` обоих узлов переход синхронный, расхождение менее 10 мс.
-- Восстановление автоматики: роль возвращается исходному узлу примерно через 2,4 с (`preempt_delay 5`).
+- Восстановление автоматики: роль возвращается исходному узлу примерно через 2,4 с.
 - Две перезагрузки обоих узлов подряд: состояние `FAULT` не возникало.
 - Пропадание связи с WB-MGE при работающих службах: health-check (`wb-ha-healthcheck.sh`) снимает узлу приоритет, и роль переходит к соседу.
 
