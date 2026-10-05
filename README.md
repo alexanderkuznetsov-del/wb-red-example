@@ -6,7 +6,7 @@
 
 ## Архитектура
 
-- Оба контроллера независимо опрашивают одни и те же Modbus-устройства через общий WB-MGE.
+- Оба контроллера независимо опрашивают одни и те же Modbus-устройства через общий WB-MGE: порт шлюза работает в режиме «Modbus TCP», в котором к одному порту можно одновременно подключить до 8 TCP-клиентов.
 - Роль узла (active/standby) определяет `keepalived` по протоколу VRRP.
 - Health-check для VRRP проверяет работу автоматики (службы `wb-rules` и `wb-mqtt-serial`) и доступность WB-MGE.
 - Читать данные с устройств могут оба узла. Запись в устройства выполняется только с активного узла через общий модуль wb-rules `wbha.js`.
@@ -51,19 +51,20 @@ wb-rules/
 
 ## Порядок установки (кратко)
 
-1. `apt-get install -y keepalived` на оба узла.
-2. Разложить `keepalived.conf.*` → `/etc/keepalived/keepalived.conf` (свой файл на каждый узел), `override.conf` → `/etc/systemd/system/keepalived.service.d/override.conf`.
-3. Скрипты из `scripts/` → `/usr/local/bin/`, права `root:root 755`.
-4. Скопировать на оба узла `cron/wb-ha-role-heartbeat` → `/etc/cron.d/wb-ha-role-heartbeat`, права `root:root 644`.
-5. `mosquitto/000persistence.conf` → `/etc/mosquitto/conf.d/`.
-6. Скопировать на оба узла (файлы одинаковые на обоих узлах):
+1. На каждом контроллере добавить в настройках драйвера wb-mqtt-serial порт типа Modbus TCP: указать IP-адрес WB-MGE и TCP-порт шлюза (по умолчанию 502 — RS-485-1, 503 — RS-485-2), затем добавить на порт устройства.
+2. `apt-get install -y keepalived` на оба узла.
+3. Разложить `keepalived.conf.*` → `/etc/keepalived/keepalived.conf` (свой файл на каждый узел), `override.conf` → `/etc/systemd/system/keepalived.service.d/override.conf`, затем выполнить `systemctl daemon-reload`.
+4. Скрипты из `scripts/` → `/usr/local/bin/`, права `root:root 755`.
+5. Скопировать на оба узла `cron/wb-ha-role-heartbeat` → `/etc/cron.d/wb-ha-role-heartbeat`, права `root:root 644`.
+6. `mosquitto/000persistence.conf` → `/etc/mosquitto/conf.d/`.
+7. Скопировать на оба узла (файлы одинаковые на обоих узлах):
    - `wb-rules/wbha.js` → `/etc/wb-rules-modules/wbha.js`;
    - `wb-rules/wb_ha_status.js` → `/etc/wb-rules/wb_ha_status.js`;
    - `wb-rules/motion_light.js` → `/etc/wb-rules/motion_light.js`.
 
    **Примечание.** Файл `motion_light.js` содержит пути к реальному оборудованию: `wb-mr6c_112/K1` и `wb-msw-v4_155/Current Motion`. Перед копированием скорректируйте их в соответствии с вашей установкой.
-7. Перезапустить `keepalived`, `mosquitto`, `wb-rules` на обоих узлах.
-8. Проверить работу пары тестами на контроллерах, см. «Тайминги, подтверждённые тестами».
+8. Перезапустить `keepalived`, `mosquitto`, `wb-rules` на обоих узлах.
+9. Проверить работу пары тестами на контроллерах, см. «Тайминги, подтверждённые тестами».
 
 ## Тайминги, подтверждённые тестами
 
