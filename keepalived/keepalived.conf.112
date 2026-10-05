@@ -33,6 +33,7 @@ vrrp_instance VI_WB_PAIR {
     }
     authentication {
         auth_type PASS
+        # Пароль VRRP замените на свой.
         auth_pass wbha1
     }
     virtual_ipaddress {
