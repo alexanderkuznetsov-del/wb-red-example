@@ -47,6 +47,8 @@ wb-rules/
 
 `wb-ha-notify.sh` и `wb-ha-role-heartbeat.sh` содержат константу `PRIORITY` (150 на узле с бо́льшим приоритетом, 100 на другом): она должна совпадать со значением `priority` в `keepalived.conf` этого же узла. `wb-ha-wait-for-ip.sh` содержит IP своего узла. `wbha.js` и `wb_ha_status.js` одинаковы на обоих узлах.
 
+**Примечание.** Имя сетевого интерфейса (`wlan0`) и IP-адреса (узлов, виртуальный IP, WB-MGE) указаны в `keepalived/keepalived.conf.*`, `scripts/wb-ha-wait-for-ip.sh`, `scripts/wb-ha-notify.sh` и `scripts/wb-ha-healthcheck.sh`. Замените их на свои.
+
 ## Порядок установки (кратко)
 
 1. `apt-get install -y keepalived` на оба узла.
