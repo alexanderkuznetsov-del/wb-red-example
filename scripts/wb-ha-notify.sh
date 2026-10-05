@@ -6,6 +6,7 @@
 # и должна совпадать со значением priority в keepalived.conf этого узла.
 ROLE="$1"
 PRIORITY=150
+# Виртуальный IP-адрес замените на свой (virtual_ipaddress в keepalived.conf).
 VIP_ADDR="192.168.143.115"
 
 logger -t wb-ha "VRRP role changed to: $ROLE"
