@@ -1,0 +1,1 @@
+* * * * * root /usr/local/bin/wb-ha-role-heartbeat.sh >/dev/null 2>&1
