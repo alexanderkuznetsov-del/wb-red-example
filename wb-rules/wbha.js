@@ -24,7 +24,7 @@ exports.dev = function (control, value) {
     if (currentRole === "active") {
         dev[control] = value;
     } else {
-        log.warning("wbha: запись в \"{}\" пропущена - узел в роли \"{}\"", control, currentRole);
+        log.warning("wbha: команда в \"{}\" не отправлена - узел в роли \"{}\"", control, currentRole);
     }
 };
 
