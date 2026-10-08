@@ -70,7 +70,7 @@ wb-rules/
 
 1. На каждом контроллере добавить в настройках драйвера wb-mqtt-serial порт типа Modbus TCP: указать IP-адрес WB-MGE и TCP-порт шлюза (по умолчанию 502 — RS-485-1, 503 — RS-485-2), затем добавить на порт устройства.
 2. `apt-get install -y keepalived` на оба узла.
-3. Разложить `keepalived.conf.*` → `/etc/keepalived/keepalived.conf` (свой файл на каждый узел), `override.conf` → `/etc/systemd/system/keepalived.service.d/override.conf`, затем выполнить `systemctl daemon-reload`.
+3. Разложить `keepalived.conf.*` → `/etc/keepalived/keepalived.conf` (свой файл на каждый узел). Создать каталог командой `mkdir -p /etc/systemd/system/keepalived.service.d`, положить в него `override.conf` → `/etc/systemd/system/keepalived.service.d/override.conf`, затем выполнить `systemctl daemon-reload`.
 4. Скрипты из `scripts/` → `/usr/local/bin/`, права `root:root 755`.
 5. Скопировать на оба узла `cron/wb-ha-role-heartbeat` → `/etc/cron.d/wb-ha-role-heartbeat`, права `root:root 644`.
 6. `mosquitto/000persistence.conf` → `/etc/mosquitto/conf.d/`.
